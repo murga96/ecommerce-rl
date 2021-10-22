@@ -5,8 +5,23 @@ import Products from './components/Products';
 import {Switch,BrowserRouter as Router, Route} from "react-router-dom"
 import SignIn from './components/SigIn';
 import SignUp from './components/SignUp';
+import { useStateValue } from './StateProvider';
+import { auth } from './firebase';
+import { actionTypes } from './reducer';
+import { useEffect } from 'react';
 
 function App() {
+    const [{user}, dispatch] = useStateValue()
+    useEffect(() => {
+        auth.onAuthStateChanged((authUser) =>{
+            console.log(authUser)
+            dispatch({
+                type: actionTypes.SET_USER,
+                user: authUser,
+            })
+        })
+    }, [])
+
     return ( 
         <div className = "App" >
         <Router>

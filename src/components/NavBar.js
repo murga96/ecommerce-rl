@@ -10,6 +10,8 @@ import { ShoppingCart } from '@mui/icons-material';
 import { Badge} from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useStateValue } from '../StateProvider';
+import { auth } from '../firebase';
+import { actionTypes } from '../reducer';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -33,7 +35,21 @@ const useStyles = makeStyles((theme) => ({
 
 export default function NavBar() {
     const classes = useStyles();
-    const [{basket}, dispatch] = useStateValue()
+    const [{basket, user}, dispatch] = useStateValue()
+
+    const handleSignOut = () => {
+        if(user){
+            auth.signOut().then(() => {
+                console.log("Sign-out successful.")
+              }).catch((error) => {
+                alert(error)
+              });
+            dispatch({
+                type: actionTypes.EMPTY_BASKET,
+                basket: [],
+            })
+        }
+    }
 
     return (
     <div className={classes.root}>
@@ -54,12 +70,12 @@ export default function NavBar() {
             </Link>
             <div className={classes.grow}/>
             <Typography variant="h6" color="textPrimary" component="div">
-                Hello Guest
+                Hello {user ? user.email : "Guest"}
             </Typography>
             <div className={classes.button}>
-                <Link to="signin">
-                    <Button variant="outlined">
-                        <strong>Sign In</strong>
+                <Link to={user ? "/" : "signin"}>
+                    <Button variant="outlined" onClick={handleSignOut}>
+                        <strong>{user ? "Sign Out" : "Sign In"}</strong>
                     </Button>
                 </Link>
                 <Link to="checkout-page">
