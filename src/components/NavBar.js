@@ -9,6 +9,7 @@ import { makeStyles } from '@mui/styles';
 import { ShoppingCart } from '@mui/icons-material';
 import { Badge} from '@mui/material';
 import { BrowserRouter, Link } from 'react-router-dom';
+import { useStateValue } from '../StateProvider';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -32,6 +33,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function NavBar() {
     const classes = useStyles();
+    const [{basket}, dispatch] = useStateValue()
 
     return (
     <div className={classes.root}>
@@ -60,7 +62,7 @@ export default function NavBar() {
                 </Button>
                 <Link to="checkout-page">
                     <IconButton>
-                        <Badge badgeContent={2} color="error">
+                        <Badge badgeContent={basket?.length} color="error">
                             <ShoppingCart fontSize="large" color="primary"/>
                         </Badge>
                     </IconButton>

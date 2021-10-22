@@ -12,6 +12,8 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { AddShoppingCart } from '@mui/icons-material';
 import accounting from "accounting";
+import { actionTypes } from '../reducer';
+import {useStateValue} from "../StateProvider"
 
 
 const ExpandMore = styled((props) => {
@@ -38,10 +40,26 @@ const useStyles = makeStyles((theme) => ({
 export default function Product({ product : {id, name, productType, image, price, rating, description} }) {
   const [expanded, setExpanded] = React.useState(false);
   const classes = useStyles()
+  const [{basket}, dispatch] = useStateValue()
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
+
+  const addToBasket = () => {
+    dispatch ({
+      type: actionTypes.ADD_TO_BASKET,
+      item: {
+        id,
+        name,
+        productType,
+        image,
+        price,
+        rating,
+        description,
+      }
+    })
+  }
 
   return (
     <Card sx={{ maxWidth: 345 }} className={classes.card}>
@@ -69,7 +87,7 @@ export default function Product({ product : {id, name, productType, image, price
       </CardContent>
       <CardActions disableSpacing>
         <IconButton aria-label="add to cart">
-          <AddShoppingCart fontSize="large"/>
+          <AddShoppingCart fontSize="large" onClick= { addToBasket }/>
         </IconButton>
         {Array(rating).fill().map((_,i) => (
             <p>&#11088;</p>

@@ -12,6 +12,8 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { AddShoppingCart, Delete } from '@mui/icons-material';
 import accounting from "accounting";
+import { useStateValue } from '../StateProvider';
+import { actionTypes } from '../reducer';
 
 
 const ExpandMore = styled((props) => {
@@ -52,6 +54,15 @@ const useStyles = makeStyles((theme) => ({
 export default function CheckoutPage({ product : {id, name, productType, image, price, rating, description} }) {
   const [expanded, setExpanded] = React.useState(false);
   const classes = useStyles()
+  const [{basket}, dispatch] = useStateValue()
+
+
+  const removeItem= () => {
+    dispatch({
+      type: actionTypes.REMOVE_ITEM_FROM_BASKET,
+      id: id,
+    })
+  }
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -87,7 +98,7 @@ export default function CheckoutPage({ product : {id, name, productType, image, 
         )}
         </div>
         <IconButton aria-label="add to cart">
-          <Delete fontSize="large"/>
+          <Delete fontSize="large" onClick={removeItem}/>
         </IconButton>
       </CardActions>
     </Card>
