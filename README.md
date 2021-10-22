@@ -1,3 +1,9 @@
+This is a eCommerce Frontend Website for buying products. In this site you can adding products to the shopping cart and check out them. Also i use firebase for the authentication proccess.
+In later version we pretend to implement a payment gateway and backend functionalities.
+Hope you enjoy!!
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
