@@ -6,6 +6,11 @@ export const actionTypes = {
     ADD_TO_BASKET: "ADD_TO_BASKET",
     REMOVE_ITEM_FROM_BASKET: "REMOVE_ITEM_FROM_BASKET",
 }
+
+export const getBasketTotal = (basket) => {
+    return basket?.reduce((ammount, item) => ammount + item.price, 0)
+}
+
 const reducer = (state, action) => {
     console.log(action)
     switch (action.type) {
