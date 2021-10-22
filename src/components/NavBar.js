@@ -8,7 +8,7 @@ import logo from "./../images/logo.png";
 import { makeStyles } from '@mui/styles';
 import { ShoppingCart } from '@mui/icons-material';
 import { Badge} from '@mui/material';
-import { BrowserRouter, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useStateValue } from '../StateProvider';
 
 const useStyles = makeStyles((theme) => ({
@@ -57,9 +57,11 @@ export default function NavBar() {
                 Hello Guest
             </Typography>
             <div className={classes.button}>
-                <Button variant="outlined">
-                    <strong>Sign In</strong>
-                </Button>
+                <Link to="signin">
+                    <Button variant="outlined">
+                        <strong>Sign In</strong>
+                    </Button>
+                </Link>
                 <Link to="checkout-page">
                     <IconButton>
                         <Badge badgeContent={basket?.length} color="error">

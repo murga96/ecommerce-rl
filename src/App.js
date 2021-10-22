@@ -3,6 +3,8 @@ import CheckoutPage from './components/CheckoutPage';
 import NavBar from './components/NavBar';
 import Products from './components/Products';
 import {Switch,BrowserRouter as Router, Route} from "react-router-dom"
+import SignIn from './components/SigIn';
+import SignUp from './components/SignUp';
 
 function App() {
     return ( 
@@ -10,6 +12,12 @@ function App() {
         <Router>
             <NavBar/>
             <Switch>
+                <Route path="/signin">
+                    <SignIn/>
+                </Route>
+                <Route path="/signup">
+                    <SignUp/>
+                </Route>
                 <Route path="/checkout-page">
                     <CheckoutPage/>
                 </Route>
@@ -17,8 +25,7 @@ function App() {
                     <Products/>
                 </Route>
             </Switch>
-        </Router>
-        
+        </Router>      
         </div>
     );
 }
