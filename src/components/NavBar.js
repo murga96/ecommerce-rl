@@ -22,7 +22,10 @@ const useStyles = makeStyles((theme) => ({
         flexGrow: 1,
     },
     button: {
-        marginLeft: 10,//theme.spacing(2),
+        marginLeft: "1rem",//theme.spacing(2),
+        display: "flex",
+        alignContent:"space-between",
+        alignItems: "center",
     },
     image: {
         marginRight: "10px",
@@ -69,10 +72,11 @@ export default function NavBar() {
                 </IconButton>
             </Link>
             <div className={classes.grow}/>
-            <Typography variant="h6" color="textPrimary" component="div">
+            <div className={classes.button}>
+            <Typography sx={{marginRight:"1rem"}} variant="h6" color="textPrimary" component="div">
                 Hello {user ? user.email : "Guest"}
             </Typography>
-            <div className={classes.button}>
+            
                 <Link to={user ? "/" : "signin"}>
                     <Button variant="outlined" onClick={handleSignOut}>
                         <strong>{user ? "Sign Out" : "Sign In"}</strong>
