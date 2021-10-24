@@ -50,7 +50,7 @@ export default function Product({ product,onAddToCart}) {
     const item = await commerce.cart.add(productId, quantity)
     dispatch({
       type: actionTypes.SET_BASKET,
-      basket: await commerce.cart.retrieve(),
+      basket: item.cart,
     })
   }
 
@@ -71,11 +71,11 @@ export default function Product({ product,onAddToCart}) {
       <CardMedia
         className={classes.media}
         image={product.image.url}
-        alt="djdj"
+        alt={product.name}
       />
       <CardContent>
         <Typography variant="body2" color="text.secondary">
-          "Shoes g"
+          "Shoes"
         </Typography>
       </CardContent>
       <CardActions disableSpacing>

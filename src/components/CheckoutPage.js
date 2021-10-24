@@ -23,7 +23,7 @@ export default function CheckoutPage() {
     function FormRow() {
         return (
             <Fragment>
-                {basket?.map((item) =>(
+                {basket?.line_items?.map((item) =>(
                     <Grid item xs={12} sm={8} md={6} lg={4}>
                         <CheckoutCard key={ item.id } product={ item }/>
                     </Grid>

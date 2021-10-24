@@ -5,6 +5,8 @@ import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Product from "./Product";
 import { commerce } from './lib/eCommerce.js/commerce';
+import { useStateValue } from '../StateProvider';
+import { actionTypes } from '../reducer';
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -17,10 +19,11 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function Products() {
   const [products, setProducts] = React.useState([])
-
+  const [{basket}, dispatch] = useStateValue();
 
   React.useEffect(() => {
     fetchProducts()
+    fetchCart()
   }, [])
 
   const fetchProducts = async() => {
@@ -28,6 +31,13 @@ export default function Products() {
     setProducts(data)
   }
 
+  const fetchCart = async() => {
+    const cart = await commerce.cart.retrieve()
+    dispatch({
+      type: actionTypes.SET_BASKET,
+      basket: cart,
+    })
+}
   
   return (
     <Box sx={{ flexGrow: 1 }}>

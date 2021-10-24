@@ -84,7 +84,7 @@ export default function NavBar() {
                 </Link>
                 <Link to="checkout-page">
                     <IconButton>
-                        <Badge badgeContent={basket?.length} color="error">
+                        <Badge badgeContent={basket?.line_items?.length} color="error">
                             <ShoppingCart fontSize="large" color="primary"/>
                         </Badge>
                     </IconButton>

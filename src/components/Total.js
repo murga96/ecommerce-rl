@@ -23,8 +23,8 @@ const Total = () => {
 
     return (
         <div className={classes.root}>
-            <h5>Total items: {basket?.length}</h5>
-            <h5>{accounting.formatMoney(getBasketTotal(basket))}</h5>
+            <h5>Total items: {basket?.total_items}</h5>
+            <h5>{basket?.subtotal.formatted_with_symbol}</h5>
             <Link to="/checkout">
                 <Button sx={{marginTop: "2rem"}} variant="contained" color="error">Check out</Button>
             </Link>            
