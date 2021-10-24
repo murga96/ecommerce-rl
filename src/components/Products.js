@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Product from "./Product";
-import products from "./../product-data";
+import { commerce } from './lib/eCommerce.js/commerce';
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -13,7 +13,22 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
+
+
 export default function Products() {
+  const [products, setProducts] = React.useState([])
+
+
+  React.useEffect(() => {
+    fetchProducts()
+  }, [])
+
+  const fetchProducts = async() => {
+    const {data} = await commerce.products.list()
+    setProducts(data)
+  }
+
+  
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={0}>

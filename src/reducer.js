@@ -17,10 +17,10 @@ export const getBasketTotal = (basket) => {
 const reducer = (state, action) => {
     console.log(action)
     switch (action.type) {
-        case "ADD_TO_BASKET":
+        case "SET_BASKET":
             return {
                 ...state,
-                basket: [...state.basket, action.item]
+                basket: action.basket,
             }
         case "REMOVE_ITEM_FROM_BASKET":
             const index = state.basket.findIndex((item => item.id === action.id))
