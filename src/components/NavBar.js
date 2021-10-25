@@ -8,7 +8,7 @@ import logo from "./../images/logo.png";
 import { makeStyles } from '@mui/styles';
 import { ShoppingCart } from '@mui/icons-material';
 import { Badge} from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useStateValue } from '../StateProvider';
 import { auth } from '../firebase';
 import { actionTypes } from '../reducer';
@@ -82,13 +82,15 @@ export default function NavBar() {
                         <strong>{user ? "Sign Out" : "Sign In"}</strong>
                     </Button>
                 </Link>
-                <Link to="checkout-page">
-                    <IconButton>
-                        <Badge badgeContent={basket?.line_items?.length} color="error">
-                            <ShoppingCart fontSize="large" color="primary"/>
-                        </Badge>
-                    </IconButton>
-                </Link>      
+                { useLocation().pathname === "/" && (
+                    <Link to="checkout-page">
+                        <IconButton >
+                            <Badge badgeContent={basket?.line_items?.length} color="error">
+                                <ShoppingCart fontSize="large" color="primary"/>
+                            </Badge>
+                        </IconButton>
+                    </Link>
+                )} 
             </div>
         </Toolbar>
       </AppBar>
