@@ -12,6 +12,8 @@ import Typography from '@mui/material/Typography';
 import { Delete } from '@mui/icons-material';
 import { useStateValue } from '../StateProvider';
 import { actionTypes } from '../reducer';
+import { commerce } from './lib/eCommerce.js/commerce';
+import { Button } from '@mui/material';
 
 const useStyles = makeStyles((theme) => ({
   media: {
@@ -24,10 +26,9 @@ const useStyles = makeStyles((theme) => ({
   grow: {
       flexGrow: 1,
   },
-  cardActions: {
-      display: "flex",
-      justifyContent: "flex-end",
-      textAlign:"center",
+  button_quantity: {
+    display: "flex",
+    justifyContent: "space-between",
   },
   cardContent: {
     display: "flex",
@@ -45,10 +46,19 @@ export default function CheckoutPage({ product }) {
     console.log(product)
   }, [])
 
-  const removeItem= () => {
+  const updateProductInCart = async(productId, quantity) => {
+    const item = await commerce.cart.update(productId, quantity)
     dispatch({
-      type: actionTypes.REMOVE_ITEM_FROM_BASKET,
-      id: product.id,
+      type: actionTypes.SET_BASKET,
+      basket: item.cart,
+    })
+  }
+
+  const removeItem= async() => {
+    const item = await commerce.cart.remove(product.id)
+    dispatch({
+      type: actionTypes.SET_BASKET,
+      basket: item.cart,
     })
   }
   return (
@@ -66,8 +76,20 @@ export default function CheckoutPage({ product }) {
           </Typography>
         </div>
       </CardContent>
-      <CardActions disableSpacing className={classes.cardActions}>    
-        <IconButton aria-label="add to cart">
+      <CardActions disableSpacing >    
+          <div className= { classes.button_quantity }>
+            <Button type="button" size="small" onClick={
+              () => updateProductInCart(product.id, {quantity: (product.quantity) - 1}) 
+            }>-</Button>
+            <Typography variant="h5">
+              {product.quantity}
+            </Typography>
+            <Button type="button" size="small" onClick={
+              () => updateProductInCart(product.id, {quantity: (product.quantity) + 1}) 
+            }>+</Button>
+          </div>
+          <div className= {classes.grow}/>
+        <IconButton aria-label="add to cart" >
           <Delete fontSize="medium" onClick={removeItem}/>
         </IconButton>
       </CardActions>
