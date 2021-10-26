@@ -73,18 +73,16 @@ export default function NavBar() {
             </Link>
             <div className={classes.grow}/>
             <div className={classes.button}>
-            <Typography sx={{marginRight:"1rem"}} variant="h6" color="textPrimary" component="div">
+            <Typography sx={{marginRight:"1rem", color: '#3b5059'}} variant="h6" color="textPrimary" component="div">
                 Hello {user ? user.email : "Guest"}
             </Typography>
-            
-                <Link to={user ? "/" : "signin"}>
-                    <Button variant="outlined" onClick={handleSignOut}>
+                <Button component={Link} to={user ? "/" : "signin"} variant="outlined" 
+                    onClick={handleSignOut} >
                         <strong>{user ? "Sign Out" : "Sign In"}</strong>
-                    </Button>
-                </Link>
+                </Button>
                 { useLocation().pathname === "/" && (
                     <Link to="checkout-page">
-                        <IconButton >
+                        <IconButton>
                             <Badge badgeContent={basket?.line_items?.length} color="error">
                                 <ShoppingCart fontSize="large" color="primary"/>
                             </Badge>

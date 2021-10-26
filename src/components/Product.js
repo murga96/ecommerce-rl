@@ -75,17 +75,13 @@ export default function Product({ product,onAddToCart}) {
       />
       <CardContent>
         <Typography variant="body2" color="text.secondary">
-          "Shoes"
+          Sports Shoes
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
         <IconButton aria-label="add to cart">
           <AddShoppingCart fontSize="large" onClick={ () => handleAddToCart(product.id, 1)}/>
         </IconButton>
-        {Array(4).fill().map((_,i) => (
-            <p>&#11088;</p>
-        )
-        )}
         <ExpandMore
           expand={expanded}
           onClick={handleExpandClick}

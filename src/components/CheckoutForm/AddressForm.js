@@ -1,109 +1,133 @@
 import * as React from 'react';
+import {useState} from 'react';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import { commerce } from '../lib/eCommerce.js/commerce';
+import { Button, InputLabel, MenuItem, Select } from '@mui/material';
+import { FormInput } from './FormInput';
+import { useForm, FormProvider }from 'react-hook-form'
+import { Link } from 'react-router-dom';
+import Box from '@mui/material/Box';
 
-export default function AddressForm() {
+export default function AddressForm({token, handle}) {
+  //Selects variables
+  const [shippingCountries, setShippingCountries] = useState([])
+  const [shippingCountry, setShippingCountry] = useState("")
+  const [shippingSubdivisions, setShippingSubdivisions] = useState([])
+  const [shippingSubdivision, setShippingSubdivision] = useState("")
+  const [shippingOptions, setShippingOptions] = useState([])
+  const [shippingOption, setShippingOption] = useState(null)
+
+  const countries = Object.entries(shippingCountries).map(([code, name]) => ({id: code, label: name}))
+  const subdivisions = Object.entries(shippingSubdivisions).map(([code, name]) => ({id: code, label: name}))
+  const options = shippingOptions.map((sO) => ({id: sO.id, label: `${sO.description} -(${sO.price.formatted_with_symbol})`}))
+
+  const fetchShippingCountries = async(token) => {
+    const {countries} = await commerce.services.localeListShippingCountries(token)
+    setShippingCountries(countries)
+    setShippingCountry(Object.keys(countries)[0])
+  }
+
+  const fetchShippingSubdivisions = async(shippingCountry) => {
+    const {subdivisions} = await commerce.services.localeListShippingSubdivisions(token.id,shippingCountry)
+    setShippingSubdivisions(subdivisions)
+    setShippingSubdivision(Object.keys(subdivisions)[0])
+  }
+
+  const fetchShippingOptions = async(tokenId, country, region=null) => {
+    const options = await commerce.checkout.getShippingOptions(tokenId, {country, region})
+    setShippingOptions(options)
+    setShippingOption(options[0].id)
+    console.log(shippingOptions)
+    console.log(shippingOption)
+  }
+
+  React.useEffect(() => {
+    fetchShippingCountries(token.id)
+  }, [])
+
+  React.useEffect(() => {
+    if(shippingCountry) fetchShippingSubdivisions(shippingCountry)
+  }, [shippingCountry])
+
+  React.useEffect(() => {
+    if(shippingSubdivision) fetchShippingOptions(token.id, shippingCountry, shippingSubdivision)
+  }, [shippingSubdivision])
+
   return (
     <React.Fragment>
       <Typography variant="h6" gutterBottom>
         Shipping address
       </Typography>
-      <Grid container spacing={3}>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            required
-            id="firstName"
-            name="firstName"
-            label="First name"
-            fullWidth
-            autoComplete="given-name"
-            variant="standard"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            required
-            id="lastName"
-            name="lastName"
-            label="Last name"
-            fullWidth
-            autoComplete="family-name"
-            variant="standard"
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            required
-            id="address1"
-            name="address1"
-            label="Address line 1"
-            fullWidth
-            autoComplete="shipping address-line1"
-            variant="standard"
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            id="address2"
-            name="address2"
-            label="Address line 2"
-            fullWidth
-            autoComplete="shipping address-line2"
-            variant="standard"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            required
-            id="city"
-            name="city"
-            label="City"
-            fullWidth
-            autoComplete="shipping address-level2"
-            variant="standard"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            id="state"
-            name="state"
-            label="State/Province/Region"
-            fullWidth
-            variant="standard"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            required
-            id="zip"
-            name="zip"
-            label="Zip / Postal code"
-            fullWidth
-            autoComplete="shipping postal-code"
-            variant="standard"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            required
-            id="country"
-            name="country"
-            label="Country"
-            fullWidth
-            autoComplete="shipping country"
-            variant="standard"
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <FormControlLabel
-            control={<Checkbox color="secondary" name="saveAddress" value="yes" />}
-            label="Use this address for payment details"
-          />
-        </Grid>
-      </Grid>
+      <FormProvider {...useForm()}>
+        <form onSubmit={useForm().handleSubmit((data) => handle({...data, setShippingCountry, shippingSubdivision, shippingOption}))}>
+          <Grid container spacing={3}>
+            <FormInput name="firstName" label="First name" autoComplete="given-name"/>
+            <FormInput name="lastName" label="Last name" autoComplete="family-name"/>
+            <FormInput name="address1" label="Address line 1" autoComplete="shipping address-line1"/>
+            <FormInput name="address2" label="Address line 2" autoComplete="shipping address-line2"/>
+            <FormInput name="city" label="City" autoComplete="shipping address-level2"/>
+            <FormInput name="zip" label="Zip / Postal code" autoComplete="shipping postal-code"/>
+            <Grid item xs={12} sm={6}>
+              <InputLabel>Shipping Subdivisions</InputLabel>
+              <Select variant="standard" fullWidth value={shippingSubdivision} onChange={(e) => setShippingSubdivision(e.target.value)}>
+                {
+                    subdivisions.map((sub) =>(
+                      <MenuItem id={sub.id} value={sub.id}>
+                      {sub.label}
+                      </MenuItem>
+                    ))
+                }
+              </Select>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <InputLabel>Shipping Countries</InputLabel>
+              <Select variant="standard" fullWidth value={shippingCountry} onChange={(e) => setShippingCountry(e.target.value)}>
+                {
+                  countries.map((country) =>(
+                    <MenuItem id={country.id} value={country.id}>
+                      {country.label}
+                    </MenuItem>
+                  ))
+                }
+              </Select>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <InputLabel>Shipping Options</InputLabel>
+              <Select variant="standard" fullWidth value={shippingOption} onChange={(e) => setShippingOption(e.target.value)}>
+                {
+                  options.map((option) =>(
+                    <MenuItem id={option.id} value={option.id}>
+                      {option.label}
+                    </MenuItem>
+                  ))
+                }
+              </Select>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={<Checkbox color="secondary" name="saveAddress" value="yes" />}
+                label="Use this address for payment details"
+              />
+            </Grid>
+          </Grid>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button variant="outlined" component={Link} to="/checkout-page" sx={{ mt: 3, ml: 1 }}>
+                      Back
+                    </Button>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{ mt: 3, ml: 1 }}
+                  >
+                  Next
+                  </Button>
+                </Box>
+        </form>
+      </FormProvider>
     </React.Fragment>
   );
 }
