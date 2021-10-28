@@ -12,6 +12,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useStateValue } from '../StateProvider';
 import { auth } from '../firebase';
 import { actionTypes } from '../reducer';
+import { commerce } from './lib/eCommerce.js/commerce';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -40,7 +41,7 @@ export default function NavBar() {
     const classes = useStyles();
     const [{basket, user}, dispatch] = useStateValue()
 
-    const handleSignOut = () => {
+    const handleSignOut = async() => {
         if(user){
             auth.signOut().then(() => {
                 console.log("Sign-out successful.")
@@ -48,8 +49,8 @@ export default function NavBar() {
                 alert(error)
               });
             dispatch({
-                type: actionTypes.EMPTY_BASKET,
-                basket: [],
+                type: actionTypes.SET_BASKET,
+                basket: await commerce.cart.empty(),
             })
         }
     }

@@ -8,9 +8,11 @@ import Checkbox from '@mui/material/Checkbox';
 import { commerce } from '../lib/eCommerce.js/commerce';
 import { Button, InputLabel, MenuItem, Select } from '@mui/material';
 import { FormInput } from './FormInput';
-import { useForm, FormProvider }from 'react-hook-form'
+import { useForm, FormProvider, Controller }from 'react-hook-form'
 import { Link } from 'react-router-dom';
 import Box from '@mui/material/Box';
+import * as yup from 'yup'
+import {yupResolver} from '@hookform/resolvers/yup'
 
 export default function AddressForm({token, handle}) {
   //Selects variables
@@ -41,8 +43,6 @@ export default function AddressForm({token, handle}) {
     const options = await commerce.checkout.getShippingOptions(tokenId, {country, region})
     setShippingOptions(options)
     setShippingOption(options[0].id)
-    console.log(shippingOptions)
-    console.log(shippingOption)
   }
 
   React.useEffect(() => {
@@ -57,13 +57,31 @@ export default function AddressForm({token, handle}) {
     if(shippingSubdivision) fetchShippingOptions(token.id, shippingCountry, shippingSubdivision)
   }, [shippingSubdivision])
 
+  //React-hook-
+  const schema = yup.object().shape({
+    firstName: yup.string().required("First name is required"),
+    lastName: yup.string().required("Last name is required"),
+    address1: yup.string().required("Address1 name is required"),
+    address2: yup.string().required("Address2 is required"),
+    city: yup.string().required("City is required"),
+    zip: yup.string().required("Zip name is required"),
+  })
+  const methods = useForm({
+    resolver: yupResolver(schema),
+  })
+  const {handleSubmit, formState: {errors}} = methods
+
+  const handle1 = (data) => {
+    console.log(data)
+  }
+
   return (
     <React.Fragment>
       <Typography variant="h6" gutterBottom>
         Shipping address
       </Typography>
-      <FormProvider {...useForm()}>
-        <form onSubmit={useForm().handleSubmit((data) => handle({...data, setShippingCountry, shippingSubdivision, shippingOption}))}>
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit((data) => handle1({...data, setShippingCountry, shippingSubdivision, shippingOption}))}>
           <Grid container spacing={3}>
             <FormInput name="firstName" label="First name" autoComplete="given-name"/>
             <FormInput name="lastName" label="Last name" autoComplete="family-name"/>
@@ -71,6 +89,7 @@ export default function AddressForm({token, handle}) {
             <FormInput name="address2" label="Address line 2" autoComplete="shipping address-line2"/>
             <FormInput name="city" label="City" autoComplete="shipping address-level2"/>
             <FormInput name="zip" label="Zip / Postal code" autoComplete="shipping postal-code"/>
+            {console.log(errors,"errors")}
             <Grid item xs={12} sm={6}>
               <InputLabel>Shipping Subdivisions</InputLabel>
               <Select variant="standard" fullWidth value={shippingSubdivision} onChange={(e) => setShippingSubdivision(e.target.value)}>
@@ -118,6 +137,7 @@ export default function AddressForm({token, handle}) {
                     <Button variant="outlined" component={Link} to="/checkout-page" sx={{ mt: 3, ml: 1 }}>
                       Back
                     </Button>
+                  {/* <input type="submit"/> */}
                   <Button
                     type="submit"
                     variant="contained"
