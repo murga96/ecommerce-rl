@@ -71,17 +71,13 @@ export default function AddressForm({token, handle}) {
   })
   const {handleSubmit, formState: {errors}} = methods
 
-  const handle1 = (data) => {
-    console.log(data)
-  }
-
   return (
     <React.Fragment>
       <Typography variant="h6" gutterBottom>
         Shipping address
       </Typography>
       <FormProvider {...methods}>
-        <form onSubmit={handleSubmit((data) => handle1({...data, setShippingCountry, shippingSubdivision, shippingOption}))}>
+        <form onSubmit={handleSubmit((data) => handle({...data, setShippingCountry, shippingSubdivision, shippingOption}))}>
           <Grid container spacing={3}>
             <FormInput name="firstName" label="First name" autoComplete="given-name"/>
             <FormInput name="lastName" label="Last name" autoComplete="family-name"/>
