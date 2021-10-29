@@ -40,7 +40,7 @@ export default function Checkout() {
       case 0:
         return token && <AddressForm token={token} handle={handleNext}/>;
       case 1:
-        return <PaymentForm shippinData={shippingData}/>;
+        return <PaymentForm token={token} shippinData={shippingData} handleBack={handleBack}/>;
       case 2:
         return <Review />;
       default:

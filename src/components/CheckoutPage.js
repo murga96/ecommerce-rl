@@ -53,7 +53,7 @@ export default function CheckoutPage() {
                     </Typography>
                 </Grid>
                 {
-                 !basket.line_items.length ? (
+                 !basket?.line_items ? (
                     <Grid item xs={12}>
                         <EmptyCart/>
                     </Grid>    

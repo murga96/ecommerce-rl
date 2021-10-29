@@ -122,18 +122,11 @@ export default function AddressForm({token, handle}) {
                 }
               </Select>
             </Grid>
-            <Grid item xs={12}>
-              <FormControlLabel
-                control={<Checkbox color="secondary" name="saveAddress" value="yes" />}
-                label="Use this address for payment details"
-              />
-            </Grid>
           </Grid>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <Button variant="outlined" component={Link} to="/checkout-page" sx={{ mt: 3, ml: 1 }}>
                       Back
                     </Button>
-                  {/* <input type="submit"/> */}
                   <Button
                     type="submit"
                     variant="contained"
