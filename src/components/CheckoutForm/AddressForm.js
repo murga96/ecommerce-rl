@@ -77,7 +77,7 @@ export default function AddressForm({token, handle}) {
         Shipping address
       </Typography>
       <FormProvider {...methods}>
-        <form onSubmit={handleSubmit((data) => handle({...data, setShippingCountry, shippingSubdivision, shippingOption}))}>
+        <form onSubmit={handleSubmit((data) => handle({...data, shippingCountry, shippingSubdivision, shippingOption}))}>
           <Grid container spacing={3}>
             <FormInput name="firstName" label="First name" autoComplete="given-name"/>
             <FormInput name="lastName" label="Last name" autoComplete="family-name"/>

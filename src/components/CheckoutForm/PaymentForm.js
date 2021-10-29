@@ -2,89 +2,148 @@ import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import { Button, List, ListItem, ListItemText } from '@mui/material';
+import { Button, Divider, List, ListItem, ListItemText } from '@mui/material';
 import { Box } from '@mui/system';
-import Checkout from './Checkout';
+import { loadStripe } from '@stripe/stripe-js';
+import Review from './Review';
+import { CardElement, Elements, ElementsConsumer } from '@stripe/react-stripe-js';
+import { commerce } from '../lib/eCommerce.js/commerce';
+import { useStateValue } from '../../StateProvider';
+import { actionTypes } from '../../reducer';
 
-export default function PaymentForm({token, shippinData, handleBack}) {
+const stripePromise = loadStripe("pk_test_51JplGrKSjZWNRAJLU2OKEcGa8AuxvqI0UGSlw46RC534qWiHxqTlQFQKqFFAYIEZsKzUx0w3HF2HG50nH0gYHSLt0027PqLpnM")
+
+export default function PaymentForm({token, shippingData, handleBack, nextStep}) {
+  const [{basket, user}, dispatch] = useStateValue()
+  console.log(shippingData, "shippingData")
+  console.log(token, "checkout_token")
+  const cardOptions = {
+    iconStyle: "solid",
+    hidePostalCode: true,
+    style: {
+      base: {
+        iconColor: "rgb(240, 57 ,122)",
+        color: "#333",
+        fontSize: "18px",
+        "::placeholder": {
+          color: "#ccc",
+        },
+      },
+    invalid: {
+      color: "#e5424d",
+      ":focus": {
+        color: "#303238"
+      },
+    }
+    }
+  }
+
+  const sanitizedLineItems = (lineItems) => {
+    return lineItems.reduce((data, lineItem) => {
+      const item = data;
+      let variantData = null;
+      if (lineItem.selected_options.length) {
+        variantData = {
+          [lineItem.selected_options[0].group_id]: lineItem.selected_options[0].option_id,
+        };
+      }
+      item[lineItem.id] = {
+        quantity: lineItem.quantity,
+        variants: variantData,
+      };
+    return item;
+    }, {});
+  };
+
+  const onCaptureCheckout = async(tokenid, newOrder) => {
+    try {
+      const incomingOrder = await commerce.checkout.capture(tokenid, newOrder)
+      console.log(incomingOrder)
+      dispatch({
+        type: actionTypes.SET_BASKET,
+        basket: await commerce.cart.refresh(),
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleSubmit = async(e, elements, stripe) => {
+    e.preventDefault()
+
+    if(!stripe || ! elements) return 
+
+    const cardElement = elements.getElement(CardElement)
+    console.log(cardElement, 'card')
+
+    const {error, paymentMethod} = await stripe.createPaymentMethod({type: "card", card: cardElement})
+
+    if(error){
+      console.log(error)
+    } 
+    else{
+      const orderData = {
+        line_items: sanitizedLineItems(token.live.line_items),
+        customer: { 
+          firstname: shippingData.firstName,
+          lastname: shippingData.lastName,
+          email: user.email },
+        shipping: { 
+          name: 'Domestic',
+          street: shippingData.address1, 
+          town_city: shippingData.city, 
+          county_state: shippingData.shippingSubdivision, 
+          postal_zip_code: shippingData.zip, 
+          country: shippingData.shippingCountry },
+        fulfillment: { shipping_method: shippingData.shippingOption },
+        payment: {
+          gateway: 'test_gateway',
+          card: {
+            number: '4242 4242 4242 4242',
+            expiry_month: '01',
+            expiry_year: '23',
+            cvc: '123',
+            postal_zip_code: shippingData.zip,
+          },
+          // gateway: 'stripe',
+          // stripe: {
+          //   payment_method_id: paymentMethod.id,
+          // },
+        },
+      };
+      console.log(orderData)
+      onCaptureCheckout(token.id, orderData);
+      nextStep()
+    }
+  }
+
   return (
-    <React.Fragment>
-      <Typography variant="h6" gutterBottom>
-        Order summary
-      </Typography>
-      {console.log(token)}
-      <List disablePadding>
-        {token.live.line_items.map((product) => (
-          <ListItem key={product.name } sx={{ py: "10px", px: 0 }}>
-            <ListItemText primary={product.name} secondary={`Quantity: ${product.quantity}`}  />
-            <Typography variant="body">{product.line_total.formatted_with_symbol}</Typography>
-          </ListItem> 
-        ))}
-
-        <ListItem sx={{ py: 1, px: 0 }}>
-          <ListItemText primary="Total" />
-          <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-            {token.live.subtotal.formatted_with_symbol}
-          </Typography>
-        </ListItem>
-      </List>
+    <>
+      <Review token={token}/>
+      <Divider sx={{mb: "1rem"}}/>
       <Typography variant="h6" gutterBottom>
         Payment method
       </Typography>
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <TextField
-            required
-            id="cardName"
-            label="Name on card"
-            fullWidth
-            autoComplete="cc-name"
-            variant="standard"
-          />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <TextField
-            required
-            id="cardNumber"
-            label="Card number"
-            fullWidth
-            autoComplete="cc-number"
-            variant="standard"
-          />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <TextField
-            required
-            id="expDate"
-            label="Expiry date"
-            fullWidth
-            autoComplete="cc-exp"
-            variant="standard"
-          />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <TextField
-            required
-            id="cvv"
-            label="CVV"
-            helperText="Last three digits on signature strip"
-            fullWidth
-            autoComplete="cc-csc"
-            variant="standard"
-          />
-        </Grid>
-      </Grid>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button variant="outlined" sx={{ mt: 3, ml: 1 }} onClick={handleBack}>
-            Back
-          </Button>
-          <Button 
-            variant="contained"
-            sx={{ mt: 3, ml: 1 }}
-          >
-            Pay
-          </Button>
-        </Box>
-    </React.Fragment>
+      <Elements stripe={stripePromise}>
+        <ElementsConsumer>
+          {({elements, stripe}) => (
+              <>
+                <form onSubmit={(e) => handleSubmit(e, elements, stripe)}>
+                <div sx={{ display: 'flex', justifyContent: 'space-between'}}>
+                  <CardElement options={cardOptions} />
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end'}}>
+                    <Button variant="outlined" sx={{ mt: 3, ml: 1 }} onClick={handleBack}>Back</Button>
+                    <Button variant="contained" type="submit" sx={{ mt: 3, ml: 1 }} disabled={!stripe}>
+                      {`Pay ${token.live.subtotal.formatted_with_symbol}`}
+                    </Button>
+                  </Box>
+                </div>
+              </form>
+            </>
+          )
+          }
+        </ElementsConsumer>
+      </Elements>
+    </>
   );
 }

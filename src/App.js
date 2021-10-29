@@ -15,7 +15,7 @@ function App() {
     const [{user}, dispatch] = useStateValue()
     useEffect(() => {
         auth.onAuthStateChanged((authUser) =>{
-            console.log(authUser)
+            console.log(authUser, "authUser")
             dispatch({
                 type: actionTypes.SET_USER,
                 user: authUser,
