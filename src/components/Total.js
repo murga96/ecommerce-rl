@@ -1,9 +1,8 @@
 import { Button } from '@mui/material';
 import { makeStyles } from '@mui/styles'
-import accounting from 'accounting';
 import React from 'react'
 import { Link } from 'react-router-dom';
-import { actionTypes, getBasketTotal } from '../reducer';
+import { actionTypes} from '../reducer';
 import { useStateValue } from '../StateProvider';
 import { commerce } from './lib/eCommerce.js/commerce';
 
@@ -12,12 +11,12 @@ const useStyles = makeStyles((theme) => ({
         display:"flex",
         flexDirection: "column",
         justifyContent: "center",
-        alignItems: 'center',
+        alignItems: 'flex-start',
+        textAlign: "center",
         height: "20vh",
-        marginTop: 20,
+        margin: "2rem",
     },
     total_buttons: {
-
         display: "flex",
         justifyContent: "space-between",
     },
