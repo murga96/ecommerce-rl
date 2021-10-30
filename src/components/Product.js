@@ -75,7 +75,7 @@ export default function Product({ product,onAddToCart}) {
       />
       <CardContent>
         <Typography variant="body2" color="text.secondary">
-          Sports Shoes
+          {product.categories?.length > 0 ? product.categories[0].name : "" }
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
