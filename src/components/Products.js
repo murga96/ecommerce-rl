@@ -1,13 +1,14 @@
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
-import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Product from "./Product";
 import { commerce } from './lib/eCommerce.js/commerce';
 import { useStateValue } from '../StateProvider';
 import { actionTypes } from '../reducer';
-import { Typography } from '@mui/material';
+import { ConnectionErrorComponent } from './ConnectionErrorComponent';
+import { Box } from '@mui/system';
+
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -48,15 +49,6 @@ export default function Products() {
       setError(true)
     } 
 }
-  const ConnectionErrorComponent = () => {
-    return(
-        <React.Fragment>
-            <Typography align='center' variant="h6" sx={{mt:"10rem"}}>
-              There appears to be trouble with your network connection.
-            </Typography>
-        </React.Fragment>
-    )
-  }
   
   return (
     <Box sx={{ flexGrow: 1 }}>

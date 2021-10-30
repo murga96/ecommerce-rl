@@ -5,6 +5,8 @@ import { makeStyles } from '@mui/styles';
 import Total from './Total';
 import { useStateValue } from '../StateProvider';
 import { Link } from 'react-router-dom';
+import { ConnectionErrorComponent } from './ConnectionErrorComponent';
+import { Box } from '@mui/system';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -20,6 +22,8 @@ const useStyles = makeStyles((theme) => ({
 export default function CheckoutPage() {
     const classes = useStyles();
     const [{basket}, dispatch] = useStateValue()
+
+    console.log(basket, "basket")
 
     function FormRow() {
         return (
@@ -45,7 +49,18 @@ export default function CheckoutPage() {
     }
 
     return (
-        <div className={classes.root}>
+        <>
+        {
+        (!basket) ? (
+            <Box sx={{ flexGrow: 1 }}>
+                <Grid container spacing={0}>
+                    <Grid item xs={12}>
+                        <ConnectionErrorComponent/> 
+                    </Grid>
+                </Grid>
+            </Box>     
+        ):(
+            <div className={classes.root}>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
                     <Typography align='center' gutterBottom variant="h4">
@@ -73,5 +88,9 @@ export default function CheckoutPage() {
                 
             </Grid>
         </div>
+        )
+       }
+      </>  
     )
 }
+
