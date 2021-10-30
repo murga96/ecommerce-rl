@@ -63,8 +63,10 @@ export default function PaymentForm({token, shippingData, handleBack, nextStep})
         type: actionTypes.SET_BASKET,
         basket: await commerce.cart.refresh(),
       })
+      return true
     } catch (error) {
-      console.log(error)
+      console.log(error.data.error.message)
+      return false
     }
   }
 
@@ -112,8 +114,9 @@ export default function PaymentForm({token, shippingData, handleBack, nextStep})
         },
       };
       console.log(orderData)
-      onCaptureCheckout(token.id, orderData);
-      nextStep()
+      if(onCaptureCheckout(token.id, orderData)) {
+        nextStep()
+      }
     }
   }
 
