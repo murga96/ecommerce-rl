@@ -8,7 +8,7 @@ import Checkbox from '@mui/material/Checkbox';
 import { commerce } from '../lib/eCommerce.js/commerce';
 import { Button, InputLabel, MenuItem, Select } from '@mui/material';
 import { FormInput } from './FormInput';
-import { useForm, FormProvider, Controller }from 'react-hook-form'
+import { useForm, FormProvider }from 'react-hook-form'
 import { Link } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import * as yup from 'yup'

@@ -75,7 +75,7 @@ export default function NavBar() {
             <div className={classes.grow}/>
             <div className={classes.button}>
             <Typography sx={{marginRight:"1rem", color: '#3b5059'}} variant="h6" color="textPrimary" component="div">
-                Hello {user ? user.email : "Guest"}
+                Hello {user ? user.displayName : "Guest"}
             </Typography>
                 <Button component={Link} to={user ? "/" : "signin"} variant="outlined" 
                     onClick={handleSignOut} >

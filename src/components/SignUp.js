@@ -3,9 +3,9 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
+import * as yup from "yup"
+import {yupResolver} from "@hookform/resolvers/yup"
+import {Controller, useForm, FormProvider} from "react-hook-form"
 import {Link as RouteLink, useHistory} from "react-router-dom"
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -13,47 +13,43 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { auth } from 'firebase';
+import { auth } from './../firebase';
 
-
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
 
 const theme = createTheme();
 
 export default function SignUp() {
-    const [email, setEmail] = React.useState("")
-    const [password, setPassword] = React.useState("")
     const history = useHistory()
 
-    const signup = (e,) => {
-        e.preventDefault();
-        auth().createUserWithEmailAndPassword(email, password).then((auth) =>{
-            console.log(auth)
-            if(auth){
-                history.push("/")
-            }
-        }).catch(err=>alert(err.message))
-    }
+    //react-hook-form
+    const schema = yup.object().shape({
+      firstName: yup.string().required("First name is required"),
+      lastName: yup.string().required("Last name is required"),
+      email: yup.string().email(),
+      password: yup.string().required("Password is required"),
+    })
+    const {handleSubmit, control, formState: {errors}} = useForm({
+      resolver: yupResolver(schema),
+    })
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    // eslint-disable-next-line no-console
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+  const handleDataSubmit = async(data) => {
+    console.log(data, "data")
+    
+    auth.createUserWithEmailAndPassword(data.email, data.password).then((user) =>{
+      user.user.updateProfile({
+        displayName: data.firstName,
+      }).then(() => {
+        console.log(user, "user")
+        if(auth){
+          history.push("/")
+        }
+      }).catch(
+        err=>alert(err.message)
+      )
+    }).catch(
+      err=>alert(err.message)
+    )
+    console.log(data, "data")
   };
 
   return (
@@ -74,80 +70,108 @@ export default function SignUp() {
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
-          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  autoComplete="given-name"
-                  name="firstName"
-                  required
-                  fullWidth
-                  id="firstName"
-                  label="First Name"
-                  autoFocus
-                />
+          <Box sx={{ mt: 3 }}>
+            <form onSubmit={handleSubmit(handleDataSubmit)}>
+            {console.log(errors,"Errors")}
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <Controller
+                      render={({field}) => (
+                        <TextField
+                          {...field}
+                          autoComplete="given-name"
+                          name="firstName"
+                          fullWidth
+                          id="firstName"
+                          label="First Name"
+                          autoFocus
+                          error={!!errors["firstName"]}
+                          helperText={errors["firstName"]?.message ?? ''}
+                        />
+                      )}
+                      control={control}
+                      defaultValue=""
+                      name="firstName"      
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Controller
+                        render={({field}) => (
+                          <TextField
+                            {...field}
+                            fullWidth
+                            id="lastName"
+                            label="Last Name"
+                            name="lastName"
+                            autoComplete="family-name"
+                            error={!!errors["lastName"]}
+                            helperText={errors["lastName"]?.message ?? ''}
+                          />
+                        )}
+                        control={control}
+                        defaultValue=""
+                        name="lastName"       
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                  <Controller
+                          render={({field}) => (
+                            <TextField
+                              {...field}
+                              fullWidth
+                              id="email"
+                              label="Email Address"
+                              autoComplete="email"
+                              error={!!errors["email"]}
+                              helperText={errors["email"]?.message ?? ''}
+                            />
+                          )}
+                          control={control}
+                          defaultValue=""
+                          name="email"       
+                      />
+                </Grid>
+                <Grid item xs={12}>
+                  <Controller
+                          render={({field}) => (
+                            <TextField
+                              {...field}
+                              fullWidth
+                              name="password"
+                              label="Password"
+                              type="password"
+                              id="password"
+                              autoComplete="new-password"
+                              error={!!errors["password"]}
+                              helperText={errors["password"]?.message ?? ''}
+                            />
+                          )}
+                          control={control}
+                          defaultValue=""
+                          name="password"      
+                      />
+                </Grid>
               </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  required
-                  fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="family-name"
-                />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+                // onClick={signup}
+              >
+                Sign Up
+              </Button>
+              <Grid container justifyContent="flex-end">
+                <Grid item>
+                  <RouteLink to="signin">
+                    Already have an account? Sign in
+                  </RouteLink>
+                </Grid>
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  value={email}
-                  onChange= { e => setEmail(e.target.value)}
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  value= {password}
-                  onChange={ e => setPassword(e.target.value) }
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                />
-              </Grid>
-            </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              onClick={signup}
-            >
-              Sign Up
-            </Button>
-            <Grid container justifyContent="flex-end">
-              <Grid item>
-                <RouteLink to="signin">
-                  Already have an account? Sign in
-                </RouteLink>
-              </Grid>
-            </Grid>
+            </form>
+            
           </Box>
         </Box>
-        <Copyright sx={{ mt: 5 }} />
       </Container>
     </ThemeProvider>
   );
