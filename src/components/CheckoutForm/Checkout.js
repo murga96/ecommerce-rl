@@ -17,12 +17,12 @@ const theme = createTheme();
 export default function Checkout() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [shippingData, setShippingData] = React.useState(0);
-  const [{basket}, dispatch] = useStateValue();
+  const [{basket, orderNumber}, dispatch] = useStateValue();
   const [token, setToken] = React.useState(null);
 
   React.useEffect(() => {
       const generateToken = async() => {
-        const token = await commerce.checkout.generateToken(basket.id, {type: "cart"})
+        const token = await commerce.checkout.generateToken(basket?.id, {type: "cart"})
         setToken(token)
       }
       generateToken()
@@ -68,13 +68,13 @@ export default function Checkout() {
             ))}
           </Stepper>
           <React.Fragment>
-            {activeStep === steps.length ? (
+            {(activeStep === steps.length) ? (
               <React.Fragment>
                 <Typography variant="h5" gutterBottom>
                   Thank you for your order.
                 </Typography>
                 <Typography variant="subtitle1">
-                  Your order number is #2001539. We have emailed your order
+                  Your order number is {orderNumber}. We have emailed your order
                   confirmation, and will send you an update when your order has
                   shipped.
                 </Typography>

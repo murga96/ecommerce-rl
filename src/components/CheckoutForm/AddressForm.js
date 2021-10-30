@@ -62,7 +62,7 @@ export default function AddressForm({token, handle}) {
     firstName: yup.string().required("First name is required"),
     lastName: yup.string().required("Last name is required"),
     address1: yup.string().required("Address1 name is required"),
-    address2: yup.string().required("Address2 is required"),
+    address2: yup.string(),
     city: yup.string().required("City is required"),
     zip: yup.string().required("Zip name is required"),
   })

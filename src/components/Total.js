@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Total = () => {
     const classes = useStyles();
-    const [{basket}, dispatch] = useStateValue()
+    const [{basket, user}, dispatch] = useStateValue()
 
     const emptyCart = async() => {
         await commerce.cart.empty()
@@ -40,7 +40,7 @@ const Total = () => {
             <h5>Total items: {basket?.total_items}</h5>
             <h5>{basket?.subtotal.formatted_with_symbol}</h5>
             <div className={classes.total_buttons}>
-                <Button component={Link} to="/checkout" sx={{marginTop: "2rem"}} variant="contained" color="error">Check out</Button>
+                <Button component={Link} to="/checkout" sx={{marginTop: "2rem"}} variant="contained" color="error" disabled={!user}>Check out</Button>
                 <Button 
                 sx={{marginTop: "2rem", marginLeft: "2rem"}}
                 variant="contained" 

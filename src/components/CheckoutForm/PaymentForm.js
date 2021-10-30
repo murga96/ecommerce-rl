@@ -14,7 +14,7 @@ import { actionTypes } from '../../reducer';
 const stripePromise = loadStripe("pk_test_51JplGrKSjZWNRAJLU2OKEcGa8AuxvqI0UGSlw46RC534qWiHxqTlQFQKqFFAYIEZsKzUx0w3HF2HG50nH0gYHSLt0027PqLpnM")
 
 export default function PaymentForm({token, shippingData, handleBack, nextStep}) {
-  const [{basket, user}, dispatch] = useStateValue()
+  const [{basket, user, orderNumber}, dispatch] = useStateValue()
   console.log(shippingData, "shippingData")
   console.log(token, "checkout_token")
   const cardOptions = {
@@ -55,19 +55,26 @@ export default function PaymentForm({token, shippingData, handleBack, nextStep})
     }, {});
   };
 
+  const handlingDispatch = async(order) => {
+    dispatch({
+      type: actionTypes.SET_ORDER_NUMBER,
+      orderNumber: order.customer_reference
+    })
+    dispatch({
+      type: actionTypes.SET_BASKET,
+      basket: await commerce.cart.refresh(),
+    })
+    console.log(order.customer_reference,"id_customer")
+    nextStep()
+  }
+
   const onCaptureCheckout = async(tokenid, newOrder) => {
-    try {
-      const incomingOrder = await commerce.checkout.capture(tokenid, newOrder)
-      console.log(incomingOrder)
-      dispatch({
-        type: actionTypes.SET_BASKET,
-        basket: await commerce.cart.refresh(),
-      })
-      return true
-    } catch (error) {
-      console.log(error.data.error.message)
-      return false
-    }
+      await commerce.checkout.capture(tokenid, newOrder).then((order) =>(
+        handlingDispatch(order)
+      )).catch(
+        // error => alert(error.data.error.message, "error in capture checkout")
+        error => alert("Your data is invalid, review the payment and address data")
+      )      
   }
 
   const handleSubmit = async(e, elements, stripe) => {
@@ -114,9 +121,7 @@ export default function PaymentForm({token, shippingData, handleBack, nextStep})
         },
       };
       console.log(orderData)
-      if(onCaptureCheckout(token.id, orderData)) {
-        nextStep()
-      }
+      onCaptureCheckout(token.id, orderData)
     }
   }
 
