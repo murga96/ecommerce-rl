@@ -7,6 +7,8 @@ import { useStateValue } from '../StateProvider';
 import { Link } from 'react-router-dom';
 import { ConnectionErrorComponent } from './ConnectionErrorComponent';
 import { Box } from '@mui/system';
+import { commerce } from './lib/eCommerce.js/commerce';
+import { actionTypes } from '../reducer';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -21,9 +23,24 @@ const useStyles = makeStyles((theme) => ({
 
 export default function CheckoutPage() {
     const classes = useStyles();
+    const [error, setError] = React.useState(false)
     const [{basket}, dispatch] = useStateValue()
 
-    console.log(basket, "basket")
+    React.useEffect(() => {
+        fetchCart()
+      }, [])
+
+    const fetchCart = async() => {
+        try {
+          const cart = await commerce.cart.retrieve()
+          dispatch({
+            type: actionTypes.SET_BASKET,
+            basket: cart,
+          })
+        } catch (error) {
+          setError(true)
+        } 
+    }
 
     function FormRow() {
         return (
@@ -51,7 +68,7 @@ export default function CheckoutPage() {
     return (
         <>
         {
-        (!basket) ? (
+        (error) ? (
             <Box sx={{ flexGrow: 1 }}>
                 <Grid container spacing={0}>
                     <Grid item xs={12}>

@@ -88,7 +88,7 @@ export default function PaymentForm({token, shippingData, handleBack, nextStep})
     const {error, paymentMethod} = await stripe.createPaymentMethod({type: "card", card: cardElement})
 
     if(error){
-      console.log(error)
+      alert(error.message)
     } 
     else{
       const orderData = {

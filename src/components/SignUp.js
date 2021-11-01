@@ -25,21 +25,18 @@ export default function SignUp() {
     const schema = yup.object().shape({
       firstName: yup.string().required("First name is required"),
       lastName: yup.string().required("Last name is required"),
-      email: yup.string().email(),
+      email: yup.string().email("Email must be a valid email").required("Email address is required"),
       password: yup.string().required("Password is required"),
     })
     const {handleSubmit, control, formState: {errors}} = useForm({
       resolver: yupResolver(schema),
     })
 
-  const handleDataSubmit = async(data) => {
-    console.log(data, "data")
-    
+  const handleDataSubmit = async(data) => {    
     auth.createUserWithEmailAndPassword(data.email, data.password).then((user) =>{
       user.user.updateProfile({
         displayName: data.firstName,
       }).then(() => {
-        console.log(user, "user")
         if(auth){
           history.push("/")
         }

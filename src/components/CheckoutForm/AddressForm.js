@@ -28,21 +28,26 @@ export default function AddressForm({token, handle}) {
   const options = shippingOptions.map((sO) => ({id: sO.id, label: `${sO.description} -(${sO.price.formatted_with_symbol})`}))
 
   const fetchShippingCountries = async(token) => {
-    const {countries} = await commerce.services.localeListShippingCountries(token)
-    setShippingCountries(countries)
-    setShippingCountry(Object.keys(countries)[0])
+    await commerce.services.localeListShippingCountries(token).then(({countries}) => {
+      setShippingCountries(countries)
+      setShippingCountry(Object.keys(countries)[0])
+    }).catch(error => console.log(error))
   }
 
   const fetchShippingSubdivisions = async(shippingCountry) => {
-    const {subdivisions} = await commerce.services.localeListShippingSubdivisions(token.id,shippingCountry)
-    setShippingSubdivisions(subdivisions)
-    setShippingSubdivision(Object.keys(subdivisions)[0])
+    await commerce.services.localeListShippingSubdivisions(token.id,shippingCountry).then(({subdivisions}) => {
+      setShippingSubdivisions(subdivisions)
+      setShippingSubdivision(Object.keys(subdivisions)[0])
+    }).catch(error => console.log(error))
+    
   }
 
   const fetchShippingOptions = async(tokenId, country, region=null) => {
-    const options = await commerce.checkout.getShippingOptions(tokenId, {country, region})
-    setShippingOptions(options)
-    setShippingOption(options[0].id)
+    await commerce.checkout.getShippingOptions(tokenId, {country, region}).then((options) => {
+      setShippingOptions(options)
+      setShippingOption(options[0].id)
+    }).catch(error => console.log(error))
+    
   }
 
   React.useEffect(() => {
